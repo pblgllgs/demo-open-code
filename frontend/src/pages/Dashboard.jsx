@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { exportUsersPdf } from "../utils/exportPdf";
 
 const roleColors = {
   ADMIN: { bg: "bg-indigo-100", text: "text-indigo-700", dot: "bg-indigo-500" },
@@ -159,9 +160,14 @@ export default function Dashboard() {
             <p className="text-slate-400 mt-1">Gestiona los usuarios registrados en la plataforma</p>
           </div>
           {!showForm && !editing && (
-            <button onClick={() => setShowForm(true)} className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors cursor-pointer">
-              + Nuevo usuario
-            </button>
+            <div className="flex gap-2">
+              <button onClick={() => exportUsersPdf(users)} className="px-5 py-2.5 bg-slate-600 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 transition-colors cursor-pointer">
+                Exportar PDF
+              </button>
+              <button onClick={() => setShowForm(true)} className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors cursor-pointer">
+                + Nuevo usuario
+              </button>
+            </div>
           )}
         </div>
 
