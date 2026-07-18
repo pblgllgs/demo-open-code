@@ -26,8 +26,8 @@ class UserServiceTest {
     @Test
     void shouldReturnAllUsers() {
         List<User> users = List.of(
-                new User(1L, "John", "john@email.com", "pass1", "ROLE_USER"),
-                new User(2L, "Jane", "jane@email.com", "pass2", "ROLE_ADMIN")
+                new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true),
+                new User(2L, "Jane", "jane@email.com", "pass2", "ROLE_ADMIN", true)
         );
         when(userRepository.findAll()).thenReturn(users);
 
@@ -48,7 +48,7 @@ class UserServiceTest {
 
     @Test
     void shouldReturnUserById() {
-        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
+        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         User result = userService.findById(1L);
@@ -70,8 +70,8 @@ class UserServiceTest {
 
     @Test
     void shouldCreateUser() {
-        User user = new User(null, "John", "john@email.com", "pass1", "ROLE_USER");
-        User savedUser = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
+        User user = new User(null, "John", "john@email.com", "pass1", "ROLE_USER", true);
+        User savedUser = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
         when(userRepository.save(user)).thenReturn(savedUser);
 
         User result = userService.create(user);
@@ -83,8 +83,8 @@ class UserServiceTest {
 
     @Test
     void shouldUpdateUserNameAndEmail() {
-        User existing = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
-        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null);
+        User existing = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
+        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null, true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -98,14 +98,14 @@ class UserServiceTest {
     @Test
     void shouldThrowExceptionWhenUpdatingNonexistentUser() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
-        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null);
+        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null, true);
 
         assertThrows(RuntimeException.class, () -> userService.update(99L, updatedDetails));
     }
 
     @Test
     void shouldDeleteUser() {
-        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
+        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         userService.delete(1L);

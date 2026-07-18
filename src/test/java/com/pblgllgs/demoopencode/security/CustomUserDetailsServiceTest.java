@@ -26,7 +26,7 @@ class CustomUserDetailsServiceTest {
 
     @Test
     void shouldLoadUserByUsernameWhenUserExists() {
-        User user = new User(1L, "John", "john@email.com", "encodedPassword", "ROLE_USER");
+        User user = new User(1L, "John", "john@email.com", "encodedPassword", "ROLE_USER", true);
         when(userRepository.findByEmail("john@email.com")).thenReturn(Optional.of(user));
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername("john@email.com");
@@ -47,7 +47,7 @@ class CustomUserDetailsServiceTest {
 
     @Test
     void shouldReturnCorrectAuthorities() {
-        User user = new User(1L, "Admin", "admin@email.com", "encodedPassword", "ROLE_ADMIN");
+        User user = new User(1L, "Admin", "admin@email.com", "encodedPassword", "ROLE_ADMIN", true);
         when(userRepository.findByEmail("admin@email.com")).thenReturn(Optional.of(user));
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername("admin@email.com");

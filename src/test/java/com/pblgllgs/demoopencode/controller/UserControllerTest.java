@@ -43,8 +43,8 @@ class UserControllerTest {
     @Test
     void shouldReturnAllUsers() throws Exception {
         List<User> users = List.of(
-                new User(1L, "John", "john@email.com", "pass1", "ROLE_USER"),
-                new User(2L, "Jane", "jane@email.com", "pass2", "ROLE_ADMIN")
+                new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true),
+                new User(2L, "Jane", "jane@email.com", "pass2", "ROLE_ADMIN", true)
         );
         when(userService.findAll()).thenReturn(users);
 
@@ -66,7 +66,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnUserById() throws Exception {
-        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
+        User user = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
         when(userService.findById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/api/users/1"))
@@ -85,8 +85,8 @@ class UserControllerTest {
 
     @Test
     void shouldCreateUserAndReturn201() throws Exception {
-        User user = new User(null, "John", "john@email.com", "pass1", "ROLE_USER");
-        User savedUser = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER");
+        User user = new User(null, "John", "john@email.com", "pass1", "ROLE_USER", true);
+        User savedUser = new User(1L, "John", "john@email.com", "pass1", "ROLE_USER", true);
         when(userService.create(any(User.class))).thenReturn(savedUser);
 
         mockMvc.perform(post("/api/users")
@@ -99,8 +99,8 @@ class UserControllerTest {
 
     @Test
     void shouldUpdateUser() throws Exception {
-        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null);
-        User updatedUser = new User(1L, "Jane", "jane@email.com", "pass1", "ROLE_USER");
+        User updatedDetails = new User(null, "Jane", "jane@email.com", null, null, true);
+        User updatedUser = new User(1L, "Jane", "jane@email.com", "pass1", "ROLE_USER", true);
         when(userService.update(eq(1L), any(User.class))).thenReturn(updatedUser);
 
         mockMvc.perform(put("/api/users/1")
