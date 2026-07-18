@@ -1,10 +1,8 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const publicLinks = [
-  { to: "/", label: "Home", icon: "🏠" },
-  { to: "/portafolio-antiguo", label: "Portafolio antiguo", icon: "📦" },
-];
+const publicLinks = [];
 
 const privateLinks = [
   { to: "/", label: "Home", icon: "🏠" },
@@ -16,13 +14,47 @@ const privateLinks = [
 ];
 
 export default function Navbar() {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowLogin(false);
+        setError("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await login(email, password);
+      setEmail("");
+      setPassword("");
+      setShowLogin(false);
+      navigate("/");
+    } catch {
+      setError("Credenciales incorrectas");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,6 +67,7 @@ export default function Navbar() {
         </Link>
 
         {/* Nav Links */}
+        {(isAuthenticated ? privateLinks : publicLinks).length > 0 && (
         <nav className="flex items-center gap-1">
           {(isAuthenticated ? privateLinks : publicLinks).map((link) => {
             const isActive = location.pathname === link.to;
@@ -54,6 +87,7 @@ export default function Navbar() {
             );
           })}
         </nav>
+        )}
 
         {/* Auth buttons */}
         {isAuthenticated ? (
@@ -65,19 +99,62 @@ export default function Navbar() {
             <span className="hidden sm:inline">Salir</span>
           </button>
         ) : (
-          <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="text-indigo-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              Iniciar Sesion
-            </Link>
-            <Link
-              to="/register"
-              className="bg-white text-indigo-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-colors"
-            >
-              Registrarse
-            </Link>
+          <div className="relative" ref={dropdownRef}>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowLogin(!showLogin)}
+                className="text-indigo-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+              >
+                Iniciar Sesion
+              </button>
+              <Link
+                to="/register"
+                className="bg-white text-indigo-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-colors"
+              >
+                Registrarse
+              </Link>
+            </div>
+
+            {/* Login Dropdown */}
+            {showLogin && (
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 p-6 z-50">
+                <h3 className="text-xl font-bold text-indigo-700 text-center mb-4">Iniciar Sesion</h3>
+                {error && (
+                  <p className="text-red-600 text-sm text-center mb-3">{error}</p>
+                )}
+                <form onSubmit={handleLogin} className="space-y-3">
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600"
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? "Entrando..." : "Login"}
+                  </button>
+                </form>
+                <p className="text-center mt-3 text-xs text-slate-500">
+                  No tienes cuenta?{" "}
+                  <Link to="/register" onClick={() => setShowLogin(false)} className="text-indigo-600 hover:underline">
+                    Registrarse
+                  </Link>
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
