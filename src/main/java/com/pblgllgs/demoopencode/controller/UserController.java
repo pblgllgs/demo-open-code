@@ -38,6 +38,11 @@ public class UserController {
         return ResponseEntity.ok(userService.update(id, user));
     }
 
+    @PatchMapping("/{id}/toggle-active")
+    public ResponseEntity<User> toggleActive(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.toggleActive(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);

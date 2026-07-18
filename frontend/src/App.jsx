@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import WeatherPage from "./pages/WeatherPage";
 import Portafolio from "./pages/Portafolio";
+import PortafolioAntiguo from "./pages/PortafolioAntiguo";
+import PortfolioAdmin from "./pages/PortfolioAdmin";
 import "./App.css";
 
 function App() {
@@ -18,14 +20,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<Home />} />
           <Route
             path="/dashboard"
             element={
@@ -47,6 +42,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Portafolio />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/portafolio-antiguo" element={<PortafolioAntiguo />} />
+          <Route
+            path="/portfolio-admin"
+            element={
+              <ProtectedRoute>
+                <PortfolioAdmin />
               </ProtectedRoute>
             }
           />

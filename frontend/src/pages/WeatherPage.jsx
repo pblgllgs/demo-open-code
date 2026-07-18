@@ -249,18 +249,10 @@ export default function WeatherPage() {
 
   const weatherInfo = weather ? weatherCodes[weather.weather_code] || weatherCodes[0] : weatherCodes[0];
 
-  if (loading || !weather) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-700 flex items-center justify-center">
-        <div className="text-white text-2xl animate-pulse">Cargando clima...</div>
-      </div>
-    );
-  }
-
   return (
     <div className={`min-h-screen bg-gradient-to-br ${weatherInfo.bg} transition-all duration-1000 relative`}>
       <Navbar />
-      <WeatherParticles code={weather.weather_code} />
+      <WeatherParticles code={weather?.weather_code ?? 0} />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-6">
 
@@ -280,6 +272,11 @@ export default function WeatherPage() {
         </div>
 
         {/* Current Weather */}
+        {loading && !weather ? (
+          <div className="text-center py-16">
+            <div className="text-white text-xl animate-pulse">Cargando clima...</div>
+          </div>
+        ) : (<>
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 mb-6 border border-white/20">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-6 md:mb-0">
@@ -346,6 +343,7 @@ export default function WeatherPage() {
             })}
           </div>
         </div>
+        </>)}
       </div>
     </div>
   );

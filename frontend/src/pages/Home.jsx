@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import API from "../api/axios";
 import Navbar from "../components/Navbar";
 
 const features = [
@@ -54,6 +56,27 @@ const stats = [
 ];
 
 export default function Home() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      toast.error("Todos los campos son obligatorios");
+      return;
+    }
+    setSending(true);
+    try {
+      await API.post("/contact-messages", form);
+      toast.success("Mensaje enviado correctamente");
+      setForm({ name: "", email: "", message: "" });
+    } catch {
+      toast.error("No fue posible enviar el mensaje");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100">
       <Navbar />
@@ -71,26 +94,6 @@ export default function Home() {
               Desde machine learning hasta generacion de contenido, la inteligencia artificial
               esta redefiniendo como vivimos y trabajamos.
             </p>
-            <div className="flex gap-4">
-              <Link
-                to="/weather"
-                className="bg-white text-indigo-700 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors"
-              >
-                Ver Clima
-              </Link>
-              <Link
-                to="/dashboard"
-                className="bg-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors"
-              >
-                Usuarios
-              </Link>
-              <Link
-                to="/portafolio"
-                className="bg-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors"
-              >
-                Portafolio
-              </Link>
-            </div>
           </div>
           <div className="flex-shrink-0 text-9xl animate-bounce">
             🤖
@@ -132,24 +135,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Newsletter Banner */}
+      {/* Contact Form */}
       <section className="bg-indigo-700 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <h2 className="text-3xl font-bold mb-4">Mantente al dia con la IA</h2>
-          <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
-            La inteligencia artificial avanza rapido. Cada dia surgen nuevas herramientas
-            y posibilidades que estan cambiando el mundo.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Tu email..."
-              className="flex-1 px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-indigo-200 border border-white/30 focus:outline-none focus:border-white"
-            />
-            <button className="px-6 py-3 bg-white text-indigo-700 rounded-lg font-semibold hover:bg-indigo-50 transition-colors cursor-pointer">
-              Suscribirse
-            </button>
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">Contactame</h2>
+            <p className="text-indigo-100 mb-8">
+              Tienes un proyecto en mente? Escribeme y hagamoslo realidad.
+            </p>
           </div>
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Tu nombre"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-indigo-200 border border-white/30 focus:outline-none focus:border-white"
+              />
+              <input
+                type="email"
+                placeholder="Tu email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-indigo-200 border border-white/30 focus:outline-none focus:border-white"
+              />
+            </div>
+            <textarea
+              placeholder="Tu mensaje..."
+              rows={4}
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              className="w-full px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-indigo-200 border border-white/30 focus:outline-none focus:border-white resize-none"
+            />
+            <div className="text-center">
+              <button
+                type="submit"
+                disabled={sending}
+                className="px-8 py-3 bg-white text-indigo-700 rounded-lg font-semibold hover:bg-indigo-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {sending ? "Enviando..." : "Enviar Mensaje"}
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 

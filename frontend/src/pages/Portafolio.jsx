@@ -1,17 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-
-const repos = [
-  { name: "demo-open-code", desc: "API REST con Spring Boot, JWT, MySQL y React", lang: "Java", url: "https://github.com/pblgllgs/demo-open-code" },
-  { name: "spring-websocket-react", desc: "Comunicacion en tiempo real con WebSocket y React", lang: "Java", url: "https://github.com/pblgllgs/spring-websocket-react" },
-  { name: "sb3-graphql-actor-movie-genre", desc: "API GraphQL con Spring Boot y Peliculas", lang: "Java", url: "https://github.com/pblgllgs/sb3-graphql-actor-movie-genre" },
-  { name: "spring-cloud-stream", desc: "Microservicios con Spring Cloud Stream", lang: "Java", url: "https://github.com/pblgllgs/spring-cloud-stream" },
-  { name: "sb3-microservices-2024-10", desc: "Arquitectura de microservicios con Spring Boot 3", lang: "Makefile", url: "https://github.com/pblgllgs/sb3-microservices-2024-10" },
-  { name: "sb3-graphql", desc: "GraphQL con Spring Boot 3", lang: "Java", url: "https://github.com/pblgllgs/sb3-graphql" },
-  { name: "restful-api-sb2-app", desc: "API RESTful con Spring Boot 2", lang: "Java", url: "https://github.com/pblgllgs/restful-api-sb2-app" },
-  { name: "spring-property-configurations", desc: "Configuracion de propiedades en Spring", lang: "Java", url: "https://github.com/pblgllgs/spring-property-configurations" },
-  { name: "spring-repository-entity-dto", desc: "Patron Repository, Entity y DTO en Spring", lang: "Java", url: "https://github.com/pblgllgs/spring-repository-entity-dto" },
-];
+import API from "../api/axios";
 
 const videos = [
   { id: "dQw4w9WgXcQ", title: "Spring Boot - Tutorial Completo" },
@@ -28,21 +17,23 @@ const skills = [
   { name: "Git", level: 85 },
 ];
 
-const langColors = {
-  Java: "#b07219",
-  Makefile: "#427819",
-  JavaScript: "#f1e05a",
-  TypeScript: "#3178c6",
-};
-
 export default function Portafolio() {
   const [githubUser, setGithubUser] = useState(null);
+  const [works, setWorks] = useState([]);
+  const [loadingWorks, setLoadingWorks] = useState(true);
 
   useEffect(() => {
     fetch("https://api.github.com/users/pblgllgs")
       .then((res) => res.json())
       .then(setGithubUser)
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    API.get("/works")
+      .then((res) => setWorks(res.data))
+      .catch(() => {})
+      .finally(() => setLoadingWorks(false));
   }, []);
 
   return (
@@ -117,37 +108,62 @@ export default function Portafolio() {
         </div>
       </section>
 
-      {/* Repositorios */}
+      {/* Proyectos del Backend */}
       <section className="max-w-5xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-indigo-800 text-center mb-8">Repositorios en GitHub</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {repos.map((repo) => (
-            <a
-              key={repo.name}
-              href={repo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-all hover:-translate-y-1 group"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z" />
-                </svg>
-                <h3 className="font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors truncate">{repo.name}</h3>
+        <h2 className="text-2xl font-bold text-indigo-800 text-center mb-8">Proyectos</h2>
+        {loadingWorks ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow-md p-5 animate-pulse">
+                <div className="h-5 bg-slate-200 rounded w-3/4 mb-3" />
+                <div className="h-3 bg-slate-200 rounded w-full mb-2" />
+                <div className="h-3 bg-slate-200 rounded w-2/3" />
               </div>
-              <p className="text-slate-500 text-sm mb-3 line-clamp-2">{repo.desc}</p>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full" style={{ background: langColors[repo.lang] || "#999" }} />
-                <span className="text-xs text-slate-400">{repo.lang}</span>
+            ))}
+          </div>
+        ) : works.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-400 text-lg">Aun no hay proyectos agregados</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {works.map((work) => (
+              <div
+                key={work.id}
+                className="bg-white rounded-lg shadow-md p-5 hover:shadow-xl transition-all hover:-translate-y-1 group"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors truncate">{work.title}</h3>
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs font-medium flex-shrink-0 ml-2">
+                    {work.category}
+                  </span>
+                </div>
+                <p className="text-slate-500 text-sm mb-3 line-clamp-2">{work.description}</p>
+                {work.tags && (
+                  <div className="flex gap-1.5 flex-wrap mb-3">
+                    {work.tags.split(",").map((tag) => (
+                      <span key={tag.trim()} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  {work.codeLink && (
+                    <a href={work.codeLink} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-slate-100 text-slate-600 py-2 rounded-lg text-xs font-medium hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                      Codigo
+                    </a>
+                  )}
+                  {work.projectLink && (
+                    <a href={work.projectLink} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-slate-100 text-slate-600 py-2 rounded-lg text-xs font-medium hover:bg-indigo-100 hover:text-indigo-700 transition-colors">
+                      Ver proyecto
+                    </a>
+                  )}
+                </div>
               </div>
-            </a>
-          ))}
-        </div>
-        <div className="text-center mt-6">
-          <a href="https://github.com/pblgllgs?tab=repositories" target="_blank" rel="noopener noreferrer" className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
-            Ver todos los repositorios
-          </a>
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Videos YouTube */}
